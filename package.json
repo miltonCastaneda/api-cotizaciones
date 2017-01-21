@@ -1,0 +1,11 @@
+{
+  "name": "api-cotizaciones",
+  "version": "1.0.0",
+  "description": "Almacenar y proveer de información sobre el precio de los productos en los principales almacenes y supermecados.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Milton Castañeda",
+  "license": "MIT"
+}
