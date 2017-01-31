@@ -1,0 +1,16 @@
+
+npm install express --save//instalar express
+ npm i -S body-parser//parsear los datos que llegan al server, funciona con midelware
+
+ npm i --D nodemon// corre los archivos si volver a correr el servidor
+"start": "nodemon index.js"//agregar comando a npm con package.json
+
+
+json formarter es una extencion para leer el json en el navegador
+
+
+npm i -S mongoose//orm para mongo
+
+
+instalar mongo
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
