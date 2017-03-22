@@ -10,36 +10,33 @@ const QuotationCrl = require('../controllers/quotation')
 const ProductQuotationCrl = require('../controllers/productQuotation')
 const LocationCrl = require('../controllers/location')
 
-
 //product
 
-api.get('/product', ProductCrl.getProducts)
-api.get('/product/:productId',ProductCrl.getProduct)
-api.post('/product',ProductCrl.saveProduct)
-api.put('/product/:productId', ProductCrl.updateProduct)
-api.delete('/product/:productId', ProductCrl.deleteProduct)
+api.get('/product', ProductCrl.all)
+api.get('/product/:productId',ProductCrl.get)
+api.post('/product',ProductCrl.save)
+api.put('/product/:productId', ProductCrl.update)
+api.delete('/product/:productId', ProductCrl.del)
 
 //users
 
-api.get('/user', UserCrl.getAll)
+api.get('/user', UserCrl.all)
 api.get('/user/:userId',UserCrl.get)
 api.post('/user',UserCrl.save)
 api.put('/user/:userId', UserCrl.update)
 api.delete('/user/:userId', UserCrl.del)
 
-
 //store
 
-api.get('/store', StoreCrl.getAll)
+api.get('/store', StoreCrl.all)
 api.get('/store/:storeId',StoreCrl.get)
 api.post('/store',StoreCrl.save)
 api.put('/store/:storeId', StoreCrl.update)
 api.delete('/store/:storeId', StoreCrl.del)
 
-
 //quotation
 //lista de cotizaciones
-api.get('/quotations', QuotationCrl.getAll)
+api.get('/quotations', QuotationCrl.all)
 //lista de cotizaciones
 api.get('/quotations/:quotationId',QuotationCrl.get)
 //agregar quotations

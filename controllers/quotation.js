@@ -6,36 +6,31 @@ se asocian muchos productos a cada quotation
 depende de los modelos productos y quotation
 */
 
-
-
 const Quotation = require('../models/quotation')
 const Location = require('../models/location')
 
 
-const getAll = ( req, res) => {
-  Quotation.find({}, (err,quotes) => {
-
-    if(err) res.status(500).send({message:'Error al realizar peticion '+err})
-    if(!quotes) {
-      res.status(404).send({message:'No existen cotizaciones'})
-      return
-    }
-    populate(quotes,res)
-
-  })
+const all = ( req, res) => {
+  let promiseModel = Quotation.find({}).exec()
+  populate(promiseModel,res)
 }
 
-const populate = (quotes,res) => {
+const populate = (promiseModel,res) => {
 
-  Location.populate(quotes, { path:'location', populate: {path:'user' }},
-    (err, quotes) => {
-      if(err) res.status(500).send({message:'Error al realizar peticion '+err})
-      if(!quotes) {
-        res.status(404).send({message:'No se encontraron quotes'})
-        return
-      }
-      res.status(200).send({ quotes })
+  promiseModel.then((quotes) => {
+    return Location.populate(quotes, { path:'location', populate: {path:'user' }})
   })
+  .then((quotes) => {
+    if(!quotes) {
+      res.status(404).send({message:'No se encontraron quotes'})
+      return
+    }
+    res.status(200).send({ quotes })
+  })
+  .catch((err) => {
+    res.status(500).send({message:'Error al realizar peticion '+err})
+  })
+
 }
 
 /*
@@ -43,15 +38,8 @@ const populate = (quotes,res) => {
 */
 const get = (req,res) => {
   let quotationId = req.params.quotationId
-  Quotation.findById(quotationId,(err,quotation) => {
-    if(err)
-      return res.status(500).send({message:'Error al realizar peticion '+err})
-
-    if(!quotation)
-      return res.status(404).send({message:'No se encontro el quotation'})
-
-    populate(quotation,res)
-  })
+  let promiseModel = Quotation.findById(quotationId).exec()
+  populate(promiseModel,res)
 }
 
 const save = (req,res) => {
@@ -62,14 +50,9 @@ const save = (req,res) => {
   quotation.maximumStop = req.body.maximumStop
   quotation.location = req.body.location
 
-  quotation.save( (err,quotationStored) => {
-    if(err) res.status(500).send({message:'Error al guardar en la base de datos '+err})
-    if(!quotationStored) {
-      res.status(404).send({ message:'No se encontro el quotation' })
-      return
-    }
-    populate(quotationStored,res)
-  })
+  let promiseModel = quotation.save()
+  populate(promiseModel,res)
+
 }
 
 const update = (req,res) => {
@@ -77,46 +60,28 @@ const update = (req,res) => {
   let quotationUpdate = req.body
   let quotationId = req.params.quotationId
 
-  Quotation.findByIdAndUpdate(quotationId, quotationUpdate, (err,quotationStored) => {
-
-      if(err){
-         res.status(500).send({ message:'Error al almacenar en la base de datos '+err })
-         return
-       }
-
-      if(!quotationStored) {
-        res.status(404).send({message:'No se encontro el quotation'})
-
-        return
-      }
-      populate(quotationStored,res)
-  })
-
+  let promiseModel = Quotation.findByIdAndUpdate(quotationId, quotationUpdate).exec()
+  populate(promiseModel,res)
 }
 
 const del = (req,res) => {
+    
     let quotationId = req.params.quotationId
-
-    Quotation.findById(quotationId, (err,quotation) => {
-      if(err) res.status(500).send({  message: 'Error al borrar  quotation: '+err})
-
+    let promiseModel = Quotation.findById(quotationId).exec()
+    
+    promiseModel.then((quotation) =>{
       if(!quotation) {
         res.status(404).send({  message: 'No se encontro el  quotation '})
         return
       }
-
-      quotation.remove((err) => {
-        if(err) res.status(500).send({  message: 'Error al borrar  quotation: '+err})
-        res.status(200).send({  message:'El quotation ha sido eliminado'}) })
+      return quotation.remove()
     })
+    
+    populate(promiseModel,res)
 }
 
-
-
-
-
 module.exports = {
-  getAll,
+  all,
   get,
   save,
   del,

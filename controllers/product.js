@@ -3,44 +3,21 @@
 const Product = require('../models/product')
 const Store = require('../models/store')
 
-const getProduct =  (req,res) => {
+const get =  (req,res) => {
   let productId = req.params.productId
 
-  Product.findById(productId, (err, product) => {
-    if(err) return res.status(500).send({message: 'Error al realizar la peticion '})
-    if(!product) return res.status(404).send({message: 'El producto no existe'})
-
-    populate(product, res)
-
-  })
+  let promiseModel = Product.findById(productId).exec()
+  populate( promiseModel, res )
 }
 
-const populate = (product, res) => {
-  console.log('populate',product)
-  //res.status(200).send({product})
-  Store.populate(product,{path:'store',populate: {path:'location',populate: {path:'user'}}}, (err, product) => {
-    if(err) res.status(500).send({message:'Error al realizar peticion '+err})
-    console.log('populate',product)
-    if(!product) {
-      res.status(404).send({message:'No se encontro ningun product'})
-      return
-    }
-    console.log('sotre',product)
-    res.status(200).send({product})
-  })
+const all = (req,res) => {
+
+  let promiseModel = Product.find({}).exec()
+  populate( promiseModel , res )
+
 }
 
-const getProducts = (req,res) => {
-  Product.find({}, (err,products)=>{
-    if(err) return res.status(500).send({message: 'Error al realizar la peticion'+err})
-    if(!products) return res.status(404).send({message:'No existen productos'})
-
-    //res.send(200,{products})
-    populate(products, res)
-  })
-}
-
-const saveProduct = (req,res) => {
+const save = (req,res) => {
 
   let product = new Product()
   product.barCode = req.body.barCode
@@ -51,36 +28,57 @@ const saveProduct = (req,res) => {
   product.description = req.body.description
   product.store = req.body.store
 
-  product.save((err, productStored) => {
-    if(err) res.status(500).send({message:'Error al savar la base de datos: '+err})
-    res.status(200).send({product: productStored})
-  })
+  let promiseModel =  product.save()
+  populate( promiseModel, res )
+
 }
 
-const updateProduct = (req, res) => {
+const update = (req, res) => {
+  
   let productId = req.params.productId
   let update = req.body
-  Product.findByIdAndUpdate(productId, update, (err, productStored) => {
-    if(err) res.status(500).send({message: 'Error  al actualizar el producto'+err})
-    res.status(200).send({product: productStored})
-  })
+  let promiseModel = Product.findByIdAndUpdate(productId, update).exec()
+  populate( promiseModel, res)
+
 }
 
-const deleteProduct = (req, res) => {
+const del = (req, res) => {
+  
   let productId = req.params.productId
+  let promiseModel = Product.findById(productId).exec()
+  
+  promiseModel.then((product) =>{
+    if(!product){
+      res.status(400).send({messag:'El producto solicitado no existe'})
+      return
+    }
+    return Product.remove()
+  })
+  
+  populate(promiseModel,res)
+}
 
-  Product.findById(productId, (err) =>{
-    if(err) res.status(500).send({message: 'Error al borrar el product: '+err})
-    Product.remove((err) => {
-      if(err) res.status(500).send({message: 'Error al borrar el product: '+err})
-      res.status(200).send({message:'El producto ha sido eliminado'})    })
+const populate = (promiseModel, res) => {
+  
+  promiseModel.then((product)=>{
+    return Product.populate(product,{path:'store',populate: {path:'location',populate: {path:'user'}}})
+  })
+  .then((product) =>{
+    if(!product) {
+      res.status(404).send({message:'No se encontro ningun product'})
+      return
+    }
+    res.status(200).send({product})
+  })
+  .catch((err) => {
+    res.status(500).send({message:'Error al realizar peticion '+err})
   })
 }
 
 module.exports = {
-  getProduct,
-  getProducts,
-  updateProduct,
-  deleteProduct,
-  saveProduct
+  get,
+  all,
+  update,
+  del,
+  save
 }

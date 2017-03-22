@@ -2,29 +2,34 @@
 
 const User = require('../models/user')
 
-const getAll = (req,res) => {
+const all = (req,res) => {
+  let promiseModel = User.find({}).exec()
+  populate(promiseModel,res)
+}
 
-  // User.find({}, (err,users) => {
-  //   if(err) res.status(500).send({message:'Error al realizar peticion '+err})
-  //   res.status(200).send({users})
-  // })
+const populate = (promiseModel, res) => {
 
-  User.find({}).exec((err,users) => {
-    if(err) res.status(500).send({message:'Error al realizar peticion '+err})
+  promiseModel.then((users) => {
+    if(!users) return res.status(400).send({message: 'El usuario ingresado no existe'})
     res.status(200).send({users})
   })
-
+  .catch((err) => {
+    res.status(500).send({message:'Error al realizar peticion '+err})
+  })
+  
 }
 
 const get = (req,res) => {
+  
   let userId = req.params.userId
-  User.findById(userId,(err,user) => {
-    if(err) res.status(500).send({message:'Error al realizar peticion '+err})
-    res.status(200).send({user})
-  })
+  let promiseModel = User.findById(userId).exec()
+
+  populate(promiseModel,res)
+
 }
 
 const save = (req,res) => {
+  
   let user = new User()
 
   user.email = req.body.email
@@ -34,10 +39,9 @@ const save = (req,res) => {
   user.signupDate = req.body.signupDate
   user.lastLogin = req.body.lastLogin
 
-  user.save((err,userStored) => {
-    if(err)res.status(500).send({message:'Error al guardar en la base de datos '+err})
-    res.status(200).send({userStored})
-  })
+  let promiseModel = user.save()
+  populate(promiseModel,res)
+
 }
 
 const update = (req,res) => {
@@ -45,34 +49,26 @@ const update = (req,res) => {
   let userUpdate = req.body
   let userId = req.params.userId
 
-  User.findByIdAndUpdate(userId, userUpdate, (err,userStored) => {
-      if(err) res.status(500).send({ message:'Error al almacenar en la base de datos '+err })
-      if(!userStored)
-        res.status(404).send({message:'No se encontro el usuario'})
-      res.status(200).send({userStored})
-  })
+  let promiseModel = User.findByIdAndUpdate(userId, userUpdate).exec()
 
+  populate(promiseModel,res)
 }
 
 const del = (req,res) => {
+    
     let userId = req.params.userId
-
-    User.findById(userId, (err,user) =>{
-      if(err) res.status(500).send({message: 'Error al borrar  user: '+err})
-
-      if(user){
-        user.remove((err) => {
-          if(err) res.status(500).send({message: 'Error al borrar  user: '+err})
-          res.status(200).send({message:'El user ha sido eliminado'}) })
-      }
-
-      res.status(404).send({message: 'No se encontro el  user '})
-
+    let promiseModel = User.findById(userId).exec()
+    
+    promiseModel.then((user) => {
+      if(!user) return res.status(404).send({message: 'No se encontro el  user '})
+      return user.remove()
     })
+    
+    populate(promiseModel, res)   
 }
 
 module.exports = {
-  getAll,
+  all,
   get,
   save,
   del,
