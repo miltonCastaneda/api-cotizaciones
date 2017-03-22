@@ -56,7 +56,7 @@ api.delete('/quotations/:quotationId', QuotationCrl.del)
 
 //location
 
-api.get('/locations', LocationCrl.getAll)
+api.get('/locations', LocationCrl.all)
 api.get('/locations/:locationId', LocationCrl.get)
 api.post('/locations', LocationCrl.save)
 api.put('/locations/:locationId', LocationCrl.update)

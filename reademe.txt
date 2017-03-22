@@ -14,3 +14,34 @@ npm i -S mongoose//orm para mongo
 
 instalar mongo
 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+start mongo "C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
+
+
+User.
+  findOne({ name: 'Val' }).
+  populate({
+    path: 'friends',
+    // Get friends of friends - populate the 'friends' array for every friend
+    populate: { path: 'friends' }
+  });
+
+
+
+promises
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      members: ['Axl', 'Slash']
+    });
+
+    var promise = gnr.save();
+    assert.ok(promise instanceof require('mpromise'));
+
+    promise.then(function (doc) {
+      assert.equal(doc.name, "Guns N' Roses");
+    });
+
+
+
+

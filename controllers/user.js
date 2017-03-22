@@ -3,10 +3,17 @@
 const User = require('../models/user')
 
 const getAll = (req,res) => {
-  User.find({}, (err,users) => {
+
+  // User.find({}, (err,users) => {
+  //   if(err) res.status(500).send({message:'Error al realizar peticion '+err})
+  //   res.status(200).send({users})
+  // })
+
+  User.find({}).exec((err,users) => {
     if(err) res.status(500).send({message:'Error al realizar peticion '+err})
     res.status(200).send({users})
   })
+
 }
 
 const get = (req,res) => {
