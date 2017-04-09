@@ -15,24 +15,6 @@ const all = ( req, res) => {
   populate(promiseModel,res)
 }
 
-const populate = (promiseModel,res) => {
-
-  promiseModel.then((quotes) => {
-    return Location.populate(quotes, { path:'location', populate: {path:'user' }})
-  })
-  .then((quotes) => {
-    if(!quotes) {
-      res.status(404).send({message:'No se encontraron quotes'})
-      return
-    }
-    res.status(200).send({ quotes })
-  })
-  .catch((err) => {
-    res.status(500).send({message:'Error al realizar peticion '+err})
-  })
-
-}
-
 /*
   listar un quotation determinado
 */
@@ -78,6 +60,24 @@ const del = (req,res) => {
     })
     
     populate(promiseModel,res)
+}
+
+const populate = (promiseModel,res) => {
+
+  promiseModel.then((quotes) => {
+    return Location.populate(quotes, { path:'location', populate: {path:'user' }})
+  })
+  .then((quotes) => {
+    if(!quotes) {
+      res.status(404).send({message:'No se encontraron quotes'})
+      return
+    }
+    res.status(200).send({ quotes })
+  })
+  .catch((err) => {
+    res.status(500).send({message:'Error al realizar peticion '+err})
+  })
+
 }
 
 module.exports = {

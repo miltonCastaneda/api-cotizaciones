@@ -48,9 +48,6 @@ api.put('/quotations/:quotationId', QuotationCrl.update)
 //eliminar qoutations
 api.delete('/quotations/:quotationId', QuotationCrl.del)
 
-
-
-
 //location
 
 api.get('/locations', LocationCrl.all)
@@ -62,7 +59,7 @@ api.delete('/locations/:locationId', LocationCrl.del)
 //productQuotation
 
 //lista de cotizacion dada con su lista de productos
-api.get('/quotations/:quotationId/products/',ProductQuotationCrl.getAll)
+api.get('/quotations/:quotationId/products/',ProductQuotationCrl.all)
 //lista el detalle del producto en la cotizacion dada
 api.get('/quotations/:quotationId/products/:productId',ProductQuotationCrl.get)
 //agregar producto a la quotation
